@@ -1,3 +1,4 @@
+import os
 import pyotp
 import qrcode
 
@@ -20,3 +21,11 @@ def verify_otp(code):
         return True
     else:
         return False
+
+
+def remove_qrcode_file(username):
+    filepath = f"./static/{username}_qrcode.png"
+    try:
+        os.remove(filepath)
+    except FileNotFoundError as e:
+        print(f"Unable to find the file. {e}")
