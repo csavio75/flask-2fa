@@ -1,9 +1,8 @@
 import json
-import base64
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from .storage import connect_db, create_tables
-from .otp import generate_otp, verify_otp, remove_qrcode_file
+from .otp import generate_otp, verify_otp
 
 app = Flask(__name__)
 CORS(app)
@@ -48,10 +47,8 @@ def login():
 
 @app.get('/otp/<username>')
 def get_otp(username):
-    img = generate_otp(username)
-    with open(img, 'rb') as image_file:
-        base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-    return jsonify({'base64_image': base64_image})
+    uri = generate_otp(username)
+    return jsonify({'uri': uri})
 
 
 @app.post('/verify_otp')
@@ -60,12 +57,6 @@ def check_otp():
     code = records['code']
     valid = verify_otp(code)
     return jsonify({'success': valid})
-
-
-@app.delete('/qrcode/remove/<username>')
-def delete_qrcode(username):
-    remove_qrcode_file(username)
-    return jsonify({'success': True})
 
 
 @app.get("/logout")
